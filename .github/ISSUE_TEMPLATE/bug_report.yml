@@ -1,0 +1,30 @@
+name: Raportare bug
+description: Raportează o eroare reproductibilă în SmartMIM.
+title: "[Bug] "
+body:
+  - type: textarea
+    id: steps
+    attributes:
+      label: Pași pentru reproducere
+      description: Include rolul utilizatorului și date de test anonimizate.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Rezultat așteptat
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Rezultat observat
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Commit / versiune și mediu
+      placeholder: SHA, Docker/local, sistem de operare
+    validations:
+      required: true
