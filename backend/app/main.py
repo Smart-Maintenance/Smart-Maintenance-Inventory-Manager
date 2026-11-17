@@ -7,6 +7,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from . import models  # noqa: F401 - înregistrează tabelele înainte de create_all
 from .database import engine, Base
+from .routers import equipment, inventory, tickets
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -16,11 +17,10 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="SmartMIM API",
     description="API pentru managementul mentenanței și al stocurilor de piese",
-    version="0.1.0",
+    version="0.2.0",
     lifespan=lifespan,
 )
 
-# Permite conectarea aplicației Frontend (Rolul 2) fără erori CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[origin.strip() for origin in os.getenv(
@@ -30,6 +30,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(equipment.router)
+app.include_router(inventory.router)
+app.include_router(tickets.router)
 
 @app.get("/", tags=["Health Check"])
 def read_root():
