@@ -36,6 +36,39 @@ Rulare din rădăcina proiectului:
 Pragul CI rămâne 70%. Acoperirea codului nu validează autentificarea, concurența,
 performanța sau toate combinațiile posibile de date.
 
+## Rapoarte și artefacte GitHub Actions
+
+După instalarea dependențelor din `backend/requirements-dev.lock`, comanda
+`pytest` generează automat:
+
+- `reports/tests.html`: raport HTML autonom cu lista testelor, rezultate,
+  durate și detalii expandabile pentru erori și motivele `xfail`/skip.
+- `reports/junit.xml`: rezultate JUnit pentru integrarea cu alte instrumente.
+  Formatul JUnit reprezintă un `xfail` ca skipped cu tipul `pytest.xfail` și
+  motivul aferent; în HTML apare separat ca XFailed.
+- `reports/coverage/index.html`: acoperire navigabilă pe fișier și linie.
+- `coverage.xml`: acoperire în format XML, păstrată în artefactul `coverage`.
+
+În GitHub: **Actions → rularea CI → Summary → Artifacts → backend-test-results**.
+Descărcați arhiva, extrageți-o și deschideți `tests.html` în browser. Filtrați
+rezultatele și extindeți rândurile pentru motive și detaliile erorilor.
+Pentru coverage, deschideți `coverage/index.html` din arhiva extrasă.
+GitHub nu afișează direct pagina HTML în secțiunea Artifacts.
+
+Artefactul este păstrat 14 zile, în limitele politicii repository-ului.
+Încărcarea este configurată cu `if: always()`, astfel încât rapoartele generate
+sunt încărcate și când testele sau pragul coverage eșuează. Dacă instalarea
+dependențelor eșuează înainte de pytest sau runnerul este întrerupt înainte de
+generare, rapoartele pot lipsi. Statusul CI continuă să eșueze la teste picate.
+
+Fișierele generate sunt ignorate de Git. Rapoartele pot conține date și loguri
+din teste; utilizați numai date de test fără secrete.
+
+Generarea a fost verificată local: 41 teste trecute, 1 xfailed, coverage 100%.
+O verificare separată cu un eșec intenționat a confirmat existența rapoartelor
+HTML și JUnit la codul de ieșire 1 și păstrarea motivelor pentru fail, xfail și
+skip. Publicarea artefactelor în GitHub se verifică după commit și push.
+
 ## Defect cunoscut QA-001 — consum duplicat pentru aceeași piesă
 
 Severitate: ridicată — stocul poate deveni negativ.

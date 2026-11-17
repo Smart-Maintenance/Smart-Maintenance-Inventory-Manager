@@ -24,7 +24,16 @@ jobs:
       - run: python -m pip install -r backend/requirements-dev.lock
       - run: python -m pip check
       - run: ruff check backend
-      - run: pytest
+      - name: Run tests and generate reports
+        run: pytest
+      - name: Upload test reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-test-results
+          path: reports/
+          retention-days: 14
+          if-no-files-found: warn
       - uses: actions/upload-artifact@v4
         if: always()
         with:
