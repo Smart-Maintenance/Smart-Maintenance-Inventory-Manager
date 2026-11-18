@@ -1,14 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .database import engine, Base
-from .routers import equipment, inventory, tickets
+from .routers import auth, equipment, inventory, tickets
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="SmartMIM API",
     description="API pentru managementul mentenantei si al stocurilor de piese",
-    version="0.2.0"
+    version="1.0.0"
 )
 
 app.add_middleware(
@@ -19,6 +19,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth.router)
 app.include_router(equipment.router)
 app.include_router(inventory.router)
 app.include_router(tickets.router)

@@ -5,6 +5,9 @@ from sqlalchemy.orm import Session
 from .. import models, schemas
 from ..database import get_db
 from .inventory import check_and_create_stock_alert
+from .auth import get_current_user, RoleChecker
+
+require_tehnician = RoleChecker([models.UserRole.ADMIN, models.UserRole.TEHNICIAN])
 
 router = APIRouter(prefix="/tickets", tags=["Maintenance Tickets"])
 
@@ -26,7 +29,12 @@ def get_tickets(db: Session = Depends(get_db)):
     return db.query(models.MaintenanceTicket).all()
 
 @router.post("/{ticket_id}/complete", response_model=schemas.TicketResponse)
-def complete_ticket(ticket_id: int, payload: schemas.TicketComplete, db: Session = Depends(get_db)):
+def complete_ticket(
+    ticket_id: int,
+    payload: schemas.TicketComplete,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(require_tehnician)
+):
     ticket = db.query(models.MaintenanceTicket).filter(models.MaintenanceTicket.id == ticket_id).first()
     if not ticket:
         raise HTTPException(status_code=404, detail="Tichetul nu a fost gasit.")

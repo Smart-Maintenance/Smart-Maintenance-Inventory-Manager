@@ -3,11 +3,16 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from .. import models, schemas
 from ..database import get_db
+from .auth import get_current_user, RoleChecker
 
 router = APIRouter(prefix="/equipment", tags=["Equipment"])
 
 @router.post("/", response_model=schemas.EquipmentResponse)
-def create_equipment(item: schemas.EquipmentCreate, db: Session = Depends(get_db)):
+def create_equipment(
+    item: schemas.EquipmentCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(RoleChecker([models.UserRole.ADMIN]))
+):
     existing = db.query(models.Equipment).filter(models.Equipment.serial_number == item.serial_number).first()
     if existing:
         raise HTTPException(status_code=400, detail="Exista deja un echipament cu acest numar de serie.")
